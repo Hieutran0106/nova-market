@@ -83,3 +83,44 @@
   .featured-section .featured-layout{grid-template-columns:minmax(0,1fr) 160px}
   .featured-section .promo-stack{grid-template-columns:1fr}
 }
+
+/* Retail layout inspired by Vietnamese electronics chains */
+.container{width:min(1280px,calc(100% - 32px))}
+.top{height:82px;grid-template-columns:275px minmax(320px,1fr) 430px;gap:20px}
+.brand-n{font-size:52px}.brand b{font-size:20px}
+.search{height:44px;border:2px solid var(--blue700);border-radius:7px}
+.search>button{background:#ffd400;color:#071b70;border-radius:0 5px 5px 0}
+.nav{height:44px;background:#0739c7}.all-cat{min-width:245px;background:#ffd400;color:#071b70}
+.nav a{font-size:12px;padding:0 15px}
+
+.home-hero{height:320px;border:0;border-radius:10px;background:#03134e;box-shadow:0 6px 20px rgba(5,24,91,.16)}
+.home-hero::after{content:"";position:absolute;z-index:1;inset:0 48% 0 0;background:linear-gradient(90deg,rgba(2,14,62,.2),rgba(2,14,62,0));pointer-events:none}
+.home-hero .hero-art{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;mix-blend-mode:normal}
+.home-hero .hero-copy{z-index:3;width:44%;padding:42px 0 0 48px}
+.home-hero .hero-kicker{display:inline-flex;padding:6px 10px;border-radius:4px;background:#ffd400;color:#071b70;font-size:12px;font-weight:800;letter-spacing:.4px}
+.home-hero h1{margin:11px 0 6px;font-size:46px;line-height:1.02;letter-spacing:-1.8px;white-space:nowrap;text-shadow:0 3px 12px rgba(0,0,0,.22)}
+.home-hero h1 b{color:#ffd400}.home-hero p{margin:0 0 18px;font-size:14px}.home-hero p strong{color:#ffd400;font-size:18px}
+.home-hero .btn{height:39px;padding:0 20px;border-radius:5px;font-size:12px}
+.home-hero .btn.primary{background:#ff5a00}.home-hero .btn.secondary{background:rgba(3,18,77,.3)}
+.home-hero .benefits{z-index:4;left:48px;bottom:22px;width:42%;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.home-hero .benefits span{grid-template-columns:18px minmax(0,1fr);column-gap:5px}
+.home-hero .benefits svg{width:16px}.home-hero .benefits b{font-size:8px;white-space:nowrap}.home-hero .benefits small{font-size:7px}
+.home-categories{height:102px;margin-top:12px;border-radius:8px;border:0;box-shadow:0 3px 12px rgba(16,24,40,.08)}
+.home-categories a{font-size:11px}.category-visual{width:58px;height:52px}
+.home-section{border:0;box-shadow:0 3px 12px rgba(16,24,40,.06)}
+
+@media(max-width:1100px){
+  .top{grid-template-columns:235px 1fr 260px}.home-hero .hero-copy{width:48%;padding-left:32px}
+  .home-hero .benefits{left:32px;width:45%}.home-hero h1{font-size:39px}
+}
+@media(max-width:850px){
+  .container{width:calc(100% - 20px)}.home-hero{height:465px}
+  .home-hero .hero-art{height:56%;top:auto;bottom:0;object-position:66% center}
+  .home-hero::after{inset:0;background:linear-gradient(180deg,rgba(3,19,78,0) 37%,#03134e 54%)}
+  .home-hero .hero-copy{width:100%;padding:23px 22px 0}.home-hero h1{font-size:34px;white-space:normal}
+  .home-hero .benefits{display:none}.home-hero .hero-kicker{font-size:10px}
+}
+@media(max-width:520px){
+  .home-hero{height:410px}.home-hero .hero-art{height:50%;object-position:66% center}
+  .home-hero h1{font-size:30px}.home-hero p{font-size:11px}.home-hero p strong{font-size:14px}
+}

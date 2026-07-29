@@ -37,22 +37,21 @@ export default function Home() {
     <div className="container nova-home">
       <section className="hero home-hero">
         <div className="hero-copy">
-          <span>SỐNG THÔNG MINH</span>
-          <h1>DEAL <b>CỰC ĐỈNH</b></h1>
-          <p>Công nghệ hiện đại · Ưu đãi ngập tràn</p>
+          <span className="hero-kicker">ĐẠI TIỆC ĐIỆN MÁY 2026</span>
+          <h1>GIÁ HÈ <b>RỰC RỠ</b></h1>
+          <p>Giảm đến <strong>50%</strong> · Trả góp 0% · Giao lắp miễn phí</p>
           <div className="hero-actions">
-            <Link className="btn primary" to="/products">Mua ngay</Link>
-            <Link className="btn secondary" to="/promotions">Xem ưu đãi</Link>
-          </div>
-          <div className="benefits">
-            <span><Box /><b>Miễn phí giao hàng</b><small>Đơn từ 500.000đ</small></span>
-            <span><BadgePercent /><b>Trả góp 0%</b><small>Lãi suất ưu đãi</small></span>
-            <span><ShieldCheck /><b>Bảo hành chính hãng</b><small>100% chính hãng</small></span>
-            <span><RefreshCcw /><b>Đổi trả dễ dàng</b><small>Trong 7 ngày</small></span>
+            <Link className="btn primary" to="/products">Săn deal ngay</Link>
+            <Link className="btn secondary" to="/promotions">Xem thể lệ</Link>
           </div>
         </div>
-        <img src="/assets/hero-products.png" alt="Ưu đãi điện máy Nova" />
-        <div className="hero-dots"><i /><i /><i /></div>
+        <div className="benefits">
+          <span><Box /><b>Miễn phí giao hàng</b><small>Đơn từ 500.000đ</small></span>
+          <span><BadgePercent /><b>Trả góp 0%</b><small>Lãi suất ưu đãi</small></span>
+          <span><ShieldCheck /><b>Bảo hành chính hãng</b><small>100% chính hãng</small></span>
+          <span><RefreshCcw /><b>Đổi trả dễ dàng</b><small>Trong 7 ngày</small></span>
+        </div>
+        <img className="hero-art" src="/assets/hero-nova-retail-v2.png" alt="Đại tiệc điện máy Nova với tivi, tủ lạnh, máy giặt và thiết bị công nghệ" />
       </section>
 
       <section className="home-categories" aria-label="Danh mục sản phẩm">
