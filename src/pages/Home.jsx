@@ -1,0 +1,124 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  AirVent, BadgePercent, Box, ChevronRight, Headphones, Laptop,
+  RefreshCcw, ShieldCheck, ShoppingBag, Smartphone, Sparkles, Tv,
+  WashingMachine,
+} from 'lucide-react';
+import { products } from '../data/store';
+import ProductCard from '../components/ProductCard';
+
+const homeCategories = [
+  { name: 'Tivi', slug: 'tivi', image: '/assets/tv.png', icon: Tv },
+  { name: 'Laptop', slug: 'laptop', image: '/assets/laptop.png', icon: Laptop },
+  { name: 'Điện thoại', slug: 'dien-thoai', image: '/assets/phone.png', icon: Smartphone },
+  { name: 'Máy lạnh', slug: 'may-lanh', image: '/assets/fridge.png', icon: AirVent },
+  { name: 'Tủ lạnh', slug: 'tu-lanh', image: '/assets/fridge.png', icon: Box },
+  { name: 'Máy giặt', slug: 'may-giat', image: '/assets/washer.png', icon: WashingMachine },
+  { name: 'Gia dụng', slug: 'gia-dung', image: '/assets/earbuds.png', icon: ShoppingBag },
+  { name: 'Phụ kiện', slug: 'phu-kien', image: '/assets/earbuds.png', icon: Headphones },
+  { name: 'Âm thanh', slug: 'am-thanh', image: '/assets/earbuds.png', icon: Headphones },
+];
+
+const tabs = ['Dành cho bạn', 'Tivi', 'Laptop', 'Điện thoại', 'Gia dụng', 'Âm thanh', 'Phụ kiện'];
+
+export default function Home() {
+  const [activeTab, setActiveTab] = useState('Dành cho bạn');
+
+  const suggested = activeTab === 'Dành cho bạn'
+    ? products.slice(6, 12)
+    : products.filter((product) => {
+      const normalized = product.category.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const tab = activeTab.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      return normalized.includes(tab);
+    });
+
+  return (
+    <div className="container nova-home">
+      <section className="hero home-hero">
+        <div className="hero-copy">
+          <span>SỐNG THÔNG MINH</span>
+          <h1>DEAL <b>CỰC ĐỈNH</b></h1>
+          <p>Công nghệ hiện đại · Ưu đãi ngập tràn</p>
+          <div className="hero-actions">
+            <Link className="btn primary" to="/products">Mua ngay</Link>
+            <Link className="btn secondary" to="/promotions">Xem ưu đãi</Link>
+          </div>
+          <div className="benefits">
+            <span><Box /><b>Miễn phí giao hàng</b><small>Đơn từ 500.000đ</small></span>
+            <span><BadgePercent /><b>Trả góp 0%</b><small>Lãi suất ưu đãi</small></span>
+            <span><ShieldCheck /><b>Bảo hành chính hãng</b><small>100% chính hãng</small></span>
+            <span><RefreshCcw /><b>Đổi trả dễ dàng</b><small>Trong 7 ngày</small></span>
+          </div>
+        </div>
+        <img src="/assets/hero-products.png" alt="Ưu đãi điện máy Nova" />
+        <div className="hero-dots"><i /><i /><i /></div>
+      </section>
+
+      <section className="home-categories" aria-label="Danh mục sản phẩm">
+        {homeCategories.map(({ name, slug, image, icon: Icon }) => (
+          <Link key={slug} to={`/products?category=${encodeURIComponent(name)}`}>
+            <span className="category-visual"><img src={image} alt="" /><Icon /></span>
+            <span>{name}</span>
+          </Link>
+        ))}
+        <Link to="/products" className="category-more">
+          <span className="category-visual"><span className="more-grid">••<br />••</span></span>
+          <span>Xem thêm</span>
+        </Link>
+      </section>
+
+      <section className="home-section featured-section">
+        <div className="home-section-head">
+          <h2><span>🔥</span> SẢN PHẨM NỔI BẬT</h2>
+          <Link to="/products">Xem tất cả <ChevronRight size={14} /></Link>
+        </div>
+        <div className="featured-layout">
+          <div className="product-grid six">
+            {products.filter((product) => product.featured).map((product) => (
+              <ProductCard key={product.id} p={product} />
+            ))}
+          </div>
+          <div className="promo-stack">
+            <Link to="/promotions" className="promo promo-installment">
+              <div><b>TRẢ GÓP 0% LÃI SUẤT</b><small>Duyệt nhanh, kỳ hạn linh hoạt</small><em>Xem ngay</em></div>
+              <strong>0<sup>%</sup></strong>
+            </Link>
+            <Link to="/promotions" className="promo promo-shipping">
+              <div><b>FREESHIP TOÀN QUỐC</b><small>Đơn hàng từ 500.000đ</small><em>Xem ngay</em></div>
+              <strong>🚚</strong>
+            </Link>
+            <Link to="/promotions" className="promo promo-flash">
+              <div><b>GIỜ VÀNG GIÁ SỐC</b><small>Deal hot mỗi ngày</small><em>Xem ngay</em></div>
+              <strong>%</strong>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section suggested-section">
+        <div className="home-section-head suggestion-head">
+          <h2><Sparkles size={18} /> GỢI Ý CHO BẠN</h2>
+          <div className="chips">
+            {tabs.map((tab) => (
+              <button
+                type="button"
+                key={tab}
+                className={activeTab === tab ? 'active' : ''}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          <Link to="/products">Xem tất cả <ChevronRight size={14} /></Link>
+        </div>
+        <div className="product-grid six">
+          {(suggested.length ? suggested : products.slice(6, 12)).map((product) => (
+            <ProductCard key={product.id} p={product} />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
