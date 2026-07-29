@@ -7,15 +7,15 @@ import ProductCard from '../components/ProductCard';
 const PAGE_SIZE=24;
 const money=value=>new Intl.NumberFormat('vi-VN').format(value)+'đ';
 const categoryBanners={
-  'Tivi':['/assets/banner-tivi.png','TUẦN LỄ SMART TV','Mãn nhãn từng khung hình','Giảm đến 35%'],
-  'Laptop':['/assets/banner-laptop.png','LAPTOP CHO MỌI NHU CẦU','Học tốt · Làm nhanh · Chơi chất','Giảm đến 30%'],
-  'Điện thoại':['/assets/banner-phone.png','SMARTPHONE THẾ HỆ MỚI','Nâng cấp ngay, ưu đãi lớn','Trợ giá 3 triệu'],
-  'Máy lạnh':['/assets/banner-air-conditioner.png','MÙA HÈ MÁT LẠNH','Mát nhanh, tiết kiệm điện','Miễn phí lắp đặt'],
-  'Tủ lạnh':['/assets/banner-fridge.png','TƯƠI NGON TRỌN VỊ','Không gian bếp tiện nghi','Giảm đến 28%'],
-  'Máy giặt':['/assets/banner-washer.png','SẠCH SÂU, NHÀN TÊNH','Chăm sóc từng sợi vải','Giảm đến 32%'],
+  'Tivi':['/assets/banner-tivi.png','TUẦN LỄ SMART TV','TV 4K, giá cực tốt','Giảm đến 35%'],
+  'Laptop':['/assets/banner-laptop.png','LAPTOP CHO MỌI NHU CẦU','Laptop mạnh, giá tốt','Giảm đến 30%'],
+  'Điện thoại':['/assets/banner-phone.png','SMARTPHONE THẾ HỆ MỚI','Nâng cấp smartphone mới','Trợ giá 3 triệu'],
+  'Máy lạnh':['/assets/banner-air-conditioner.png','MÙA HÈ MÁT LẠNH','Mát nhanh, tiết kiệm','Miễn phí lắp đặt'],
+  'Tủ lạnh':['/assets/banner-fridge.png','TƯƠI NGON TRỌN VỊ','Tủ lạnh mới, bếp tiện nghi','Giảm đến 28%'],
+  'Máy giặt':['/assets/banner-washer.png','SẠCH SÂU, NHÀN TÊNH','Giặt sạch, chăm vải tốt','Giảm đến 32%'],
   'Gia dụng':['/assets/banner-home-appliance.png','BẾP XINH, NHÀ TIỆN NGHI','Nấu ngon nhẹ nhàng hơn','Mua 2 giảm 10%'],
   'Phụ kiện':['/assets/banner-accessories.png','PHỤ KIỆN CÔNG NGHỆ','Kết nối phong cách mới','Đồng giá từ 199K'],
-  'Âm thanh':['/assets/banner-audio.png','BẬT CHẤT ÂM','Không gian giải trí sống động','Giảm đến 40%']
+  'Âm thanh':['/assets/banner-audio.png','BẬT CHẤT ÂM','Âm thanh sống động','Giảm đến 40%']
 };
 
 export default function Products(){
