@@ -1,12 +1,12 @@
 import React,{useState} from 'react';
-import {Link,useNavigate} from 'react-router-dom';
-import {Menu,Search,Phone,User,ShoppingCart,Heart,Scale,X} from 'lucide-react';
+import {Link,useLocation,useNavigate} from 'react-router-dom';
+import {Home,Menu,Search,Phone,User,ShoppingCart,Heart,Scale,X} from 'lucide-react';
 import {categories,products} from '../data/store';
 import {useStore} from '../context/StoreContext';
 import NovaAssistant from './NovaAssistant';
 
 export default function Layout({children}){
-  const nav=useNavigate(), {cartCount,wishlist,compare,user}=useStore();
+  const nav=useNavigate(), location=useLocation(), {cartCount,wishlist,compare,user}=useStore();
   const [q,setQ]=useState(''),[suggest,setSuggest]=useState(false),[mobile,setMobile]=useState(false);
   const matches=q?products.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())).slice(0,5):[];
   const submit=e=>{e.preventDefault();nav(`/products?q=${encodeURIComponent(q)}`);setSuggest(false)};
@@ -29,16 +29,41 @@ export default function Layout({children}){
         </div>
       </div>
       <nav className="nav"><div className="container nav-inner">
-        <button className="all-cat"><Menu size={18}/> DANH MỤC SẢN PHẨM</button>
+        <Link to="/" className="all-cat"><Menu size={18}/> TẤT CẢ SẢN PHẨM</Link>
+        <Link to="/" className="home-nav"><Home size={16}/> Trang chủ</Link>
         {categories.map(c=><Link key={c.slug} to={`/products?category=${encodeURIComponent(c.name)}`}>{c.icon} {c.name}</Link>)}
         <Link to="/promotions">◇ Khuyến mãi</Link>
       </div></nav>
     </header>
-    {mobile&&<><div className="backdrop" onClick={()=>setMobile(false)}/><aside className="mobile-drawer"><div className="drawer-title"><b>Danh mục</b><button onClick={()=>setMobile(false)}><X/></button></div>{categories.map(c=><Link onClick={()=>setMobile(false)} key={c.slug} to={`/products?category=${encodeURIComponent(c.name)}`}>{c.icon} {c.name}</Link>)}</aside></>}
-    <main>{children}</main>
+    {mobile&&<><div className="backdrop" onClick={()=>setMobile(false)}/><aside className="mobile-drawer"><div className="drawer-title"><b>Danh mục</b><button onClick={()=>setMobile(false)}><X/></button></div><Link onClick={()=>setMobile(false)} to="/"><Home size={16}/> Trang chủ</Link>{categories.map(c=><Link onClick={()=>setMobile(false)} key={c.slug} to={`/products?category=${encodeURIComponent(c.name)}`}>{c.icon} {c.name}</Link>)}</aside></>}
+    <main>
+      {location.pathname!=='/'&&<Link to="/" className="back-home"><Home size={15}/> Về trang chủ</Link>}
+      <RouteCampaign path={location.pathname}/>
+      {children}
+    </main>
     <Footer/>
     <NovaAssistant/>
   </>
+}
+
+const campaignRoutes=[
+  {match:path=>path.startsWith('/product/'),kicker:'NOVA SELECT',title:'Sản phẩm chính hãng, ưu đãi tận tay',copy:'Tư vấn đúng nhu cầu · Trả góp 0% · Giao lắp tận nơi',image:'/assets/tv.png',tone:'blue'},
+  {match:path=>path==='/cart',kicker:'GIỎ HÀNG CỦA BẠN',title:'Chốt đơn hôm nay, nhận ngay ưu đãi',copy:'Miễn phí vận chuyển theo điều kiện · Đổi trả trong 7 ngày',image:'/assets/home-appliance.png',tone:'orange'},
+  {match:path=>path==='/checkout',kicker:'THANH TOÁN AN TOÀN',title:'Hoàn tất đơn hàng chỉ trong vài phút',copy:'Bảo mật thông tin · Xác nhận nhanh · Hỗ trợ tận tâm',image:'/assets/phone.png',tone:'cyan'},
+  {match:path=>path==='/wishlist',kicker:'DANH SÁCH YÊU THÍCH',title:'Lưu lại sản phẩm bạn đang quan tâm',copy:'Theo dõi giá tốt và chọn mua khi phù hợp',image:'/assets/laptop.png',tone:'purple'},
+  {match:path=>path==='/compare',kicker:'SO SÁNH THÔNG MINH',title:'Đặt thông số cạnh nhau, chọn lựa dễ hơn',copy:'So sánh giá · Tính năng · Đánh giá · Tồn kho',image:'/assets/phone.png',tone:'blue'},
+  {match:path=>path==='/account',kicker:'NOVA MEMBER',title:'Một tài khoản, nhiều quyền lợi',copy:'Quản lý đơn hàng · Lưu sản phẩm · Nhận ưu đãi riêng',image:'/assets/earbuds.png',tone:'purple'},
+  {match:path=>path==='/orders'||path==='/order-success',kicker:'THEO DÕI ĐƠN HÀNG',title:'Luôn biết đơn hàng đang ở đâu',copy:'Cập nhật trạng thái và hỗ trợ giao nhận nhanh chóng',image:'/assets/speaker.png',tone:'cyan'},
+  {match:path=>['/about','/stores','/policy','/contact'].includes(path),kicker:'ĐIỆN MÁY NOVA',title:'Công nghệ hiện đại, dịch vụ tận tâm',copy:'Hàng chính hãng · Hệ thống giao lắp chuyên nghiệp',image:'/assets/fridge.png',tone:'blue'}
+];
+
+function RouteCampaign({path}){
+  if(path==='/'||path==='/products'||path==='/promotions')return null;
+  const campaign=campaignRoutes.find(item=>item.match(path))||{kicker:'ĐIỆN MÁY NOVA',title:'Mua sắm tiện nghi, an tâm mỗi ngày',copy:'Hàng chính hãng · Giá tốt · Dịch vụ tận tâm',image:'/assets/home-appliance.png',tone:'blue'};
+  return <section className={`route-campaign ${campaign.tone}`}><div className="container route-campaign-inner">
+    <div><span>{campaign.kicker}</span><h2>{campaign.title}</h2><p>{campaign.copy}</p></div>
+    <figure><i/><img src={campaign.image} alt="Ưu đãi Điện Máy Nova"/></figure>
+  </div></section>
 }
 function Footer(){return <footer className="footer"><div className="container footer-grid">
   <section><Link to="/" className="brand light"><span className="brand-n">N</span><span><b>Điện Máy Nova</b><small>Công nghệ hiện đại - Cuộc sống tiện nghi</small></span></Link><p>Hệ thống bán lẻ điện máy tích hợp trợ lý AI Nova Core, giúp chọn đúng sản phẩm theo nhu cầu và ngân sách.</p></section>

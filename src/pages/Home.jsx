@@ -12,12 +12,12 @@ const homeCategories = [
   { name: 'Tivi', slug: 'tivi', image: '/assets/tv.png', icon: Tv },
   { name: 'Laptop', slug: 'laptop', image: '/assets/laptop.png', icon: Laptop },
   { name: 'Điện thoại', slug: 'dien-thoai', image: '/assets/phone.png', icon: Smartphone },
-  { name: 'Máy lạnh', slug: 'may-lanh', image: '/assets/fridge.png', icon: AirVent },
+  { name: 'Máy lạnh', slug: 'may-lanh', image: '/assets/air-conditioner.png', icon: AirVent },
   { name: 'Tủ lạnh', slug: 'tu-lanh', image: '/assets/fridge.png', icon: Box },
   { name: 'Máy giặt', slug: 'may-giat', image: '/assets/washer.png', icon: WashingMachine },
-  { name: 'Gia dụng', slug: 'gia-dung', image: '/assets/earbuds.png', icon: ShoppingBag },
+  { name: 'Gia dụng', slug: 'gia-dung', image: '/assets/home-appliance.png', icon: ShoppingBag },
   { name: 'Phụ kiện', slug: 'phu-kien', image: '/assets/earbuds.png', icon: Headphones },
-  { name: 'Âm thanh', slug: 'am-thanh', image: '/assets/earbuds.png', icon: Headphones },
+  { name: 'Âm thanh', slug: 'am-thanh', image: '/assets/speaker.png', icon: Headphones },
 ];
 
 const tabs = ['Dành cho bạn', 'Tivi', 'Laptop', 'Điện thoại', 'Gia dụng', 'Âm thanh', 'Phụ kiện'];
@@ -54,6 +54,12 @@ export default function Home() {
         <img className="hero-art" src="/assets/hero-nova-retail-v2.png" alt="Đại tiệc điện máy Nova với tivi, tủ lạnh, máy giặt và thiết bị công nghệ" />
       </section>
 
+      <section className="campaign-strip" aria-label="Chương trình nổi bật">
+        <Link to="/products?category=Tivi"><span>TV WEEK</span><b>Giảm đến 35%</b><small>Smart TV 4K chính hãng</small></Link>
+        <Link to="/products?category=Máy lạnh"><span>MÙA HÈ MÁT LẠNH</span><b>Miễn phí lắp đặt</b><small>Điều hòa Inverter tiết kiệm điện</small></Link>
+        <Link to="/promotions"><span>ĐỔI CŨ LẤY MỚI</span><b>Trợ giá 3 triệu</b><small>Áp dụng nhiều ngành hàng</small></Link>
+      </section>
+
       <section className="home-categories" aria-label="Danh mục sản phẩm">
         {homeCategories.map(({ name, slug, image, icon: Icon }) => (
           <Link key={slug} to={`/products?category=${encodeURIComponent(name)}`}>
@@ -74,7 +80,7 @@ export default function Home() {
         </div>
         <div className="featured-layout">
           <div className="product-grid six">
-            {products.filter((product) => product.featured).map((product) => (
+            {products.filter((product) => product.featured).slice(0, 6).map((product) => (
               <ProductCard key={product.id} p={product} />
             ))}
           </div>
