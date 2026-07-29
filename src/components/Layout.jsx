@@ -29,8 +29,7 @@ export default function Layout({children}){
         </div>
       </div>
       <nav className="nav"><div className="container nav-inner">
-        <Link to="/" className="all-cat"><Menu size={18}/> TẤT CẢ SẢN PHẨM</Link>
-        <Link to="/" className="home-nav"><Home size={16}/> Trang chủ</Link>
+        <Link to="/" className="all-cat"><Home size={18}/> TRANG CHỦ</Link>
         {categories.map(c=><Link key={c.slug} to={`/products?category=${encodeURIComponent(c.name)}`}>{c.icon} {c.name}</Link>)}
         <Link to="/promotions">◇ Khuyến mãi</Link>
       </div></nav>
