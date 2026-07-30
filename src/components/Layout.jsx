@@ -57,7 +57,7 @@ const campaignRoutes=[
 ];
 
 function RouteCampaign({path}){
-  if(path==='/'||path==='/products'||path==='/promotions')return null;
+  if(path==='/'||path==='/products'||path==='/promotions'||path==='/account')return null;
   const campaign=campaignRoutes.find(item=>item.match(path))||{kicker:'ĐIỆN MÁY NOVA',title:'Mua sắm tiện nghi, an tâm mỗi ngày',copy:'Hàng chính hãng · Giá tốt · Dịch vụ tận tâm',image:'/assets/home-appliance.png',tone:'blue'};
   return <section className={`route-campaign ${campaign.tone}`}><div className="container route-campaign-inner">
     <div><span>{campaign.kicker}</span><h2>{campaign.title}</h2><p>{campaign.copy}</p></div>
