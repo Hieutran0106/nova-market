@@ -1,13 +1,29 @@
 import React, {createContext, useContext, useEffect, useMemo, useState} from 'react';
-import {products} from '../data/store';
+// import {products} from '../data/store'; // Bỏ dùng dữ liệu cứng
 
 const StoreContext=createContext(null);
 export function StoreProvider({children}){
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [cart,setCart]=useState(()=>JSON.parse(localStorage.getItem('nova_cart_v2')||'{}'));
   const [wishlist,setWishlist]=useState(()=>JSON.parse(localStorage.getItem('nova_wishlist')||'[]'));
   const [compare,setCompare]=useState([]);
   const [user,setUser]=useState(()=>JSON.parse(localStorage.getItem('nova_user')||'null'));
   const [toast,setToast]=useState('');
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/products')
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("Lỗi khi tải sản phẩm:", err);
+        setIsLoading(false);
+      });
+  }, []);
 
   useEffect(()=>localStorage.setItem('nova_cart_v2',JSON.stringify(cart)),[cart]);
   useEffect(()=>localStorage.setItem('nova_wishlist',JSON.stringify(wishlist)),[wishlist]);
@@ -21,7 +37,9 @@ export function StoreProvider({children}){
   const cartCount=Object.values(cart).reduce((a,b)=>a+b,0);
   const cartItems=Object.entries(cart).map(([id,qty])=>({product:products.find(p=>p.id===+id),qty})).filter(x=>x.product);
   const cartTotal=cartItems.reduce((s,x)=>s+x.product.price*x.qty,0);
-  const value=useMemo(()=>({cart,wishlist,compare,user,setUser,toast,notify,addToCart,updateQty,toggleWishlist,toggleCompare,cartCount,cartItems,cartTotal}),[cart,wishlist,compare,user,toast]);
+  
+  const value=useMemo(()=>({products, isLoading, cart,wishlist,compare,user,setUser,toast,notify,addToCart,updateQty,toggleWishlist,toggleCompare,cartCount,cartItems,cartTotal}),[products, isLoading, cart,wishlist,compare,user,toast]);
+  
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }
 export const useStore=()=>useContext(StoreContext);
