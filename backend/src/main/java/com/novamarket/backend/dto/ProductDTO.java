@@ -21,6 +21,7 @@ public class ProductDTO {
     private Double rating;
     private Integer reviews;
     private Integer stock;
+    private String inventoryStatus;
     private String image;
     private Boolean featured;
     private Boolean bestseller;
@@ -46,16 +47,20 @@ public class ProductDTO {
         dto.setRating(4.0 + (product.getId() % 10) / 10.0);
         dto.setReviews(50 + (product.getId() * 7 % 200));
         dto.setStock(product.getInStock() ? 10 + (product.getId() % 50) : 0);
+        dto.setInventoryStatus(product.getInventoryStatus() != null ? product.getInventoryStatus() : (product.getInStock() ? "Còn hàng" : "Hết hàng"));
         
-        // Assign default image based on category
-        String img = "/assets/laptop.png";
-        if (product.getCategory().equalsIgnoreCase("Tivi")) img = "/assets/tv.png";
-        else if (product.getCategory().equalsIgnoreCase("Điện thoại")) img = "/assets/phone.png";
-        else if (product.getCategory().equalsIgnoreCase("Máy giặt")) img = "/assets/washer.png";
-        else if (product.getCategory().equalsIgnoreCase("Tủ lạnh")) img = "/assets/fridge.png";
-        else if (product.getCategory().equalsIgnoreCase("Phụ kiện")) img = "/assets/earbuds.png";
-        
-        dto.setImage(img);
+        // Assign default image based on category or use the scraped image
+        if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+            dto.setImage(product.getImageUrl());
+        } else {
+            String img = "/assets/laptop.png";
+            if (product.getCategory().equalsIgnoreCase("Tivi")) img = "/assets/tv.png";
+            else if (product.getCategory().equalsIgnoreCase("Điện thoại")) img = "/assets/phone.png";
+            else if (product.getCategory().equalsIgnoreCase("Máy giặt")) img = "/assets/washer.png";
+            else if (product.getCategory().equalsIgnoreCase("Tủ lạnh")) img = "/assets/fridge.png";
+            else if (product.getCategory().equalsIgnoreCase("Phụ kiện")) img = "/assets/earbuds.png";
+            dto.setImage(img);
+        }
         dto.setFeatured(product.getId() % 3 == 0);
         dto.setBestseller(product.getId() % 4 == 0);
         dto.setTags(List.of(product.getCategory(), product.getBrand(), "Mới"));

@@ -18,9 +18,15 @@ public class ProductController {
     private ProductRepository productRepository;
 
     @GetMapping
-    public List<ProductDTO> getAllProducts() {
-        return productRepository.findAll()
-                .stream()
+    public List<ProductDTO> getAllProducts(@org.springframework.web.bind.annotation.RequestParam(required = false) String category) {
+        List<com.novamarket.backend.models.Product> products;
+        if (category != null && !category.isEmpty() && !category.equalsIgnoreCase("Tất cả")) {
+            products = productRepository.findByCategoryIgnoreCase(category);
+        } else {
+            products = productRepository.findAll();
+        }
+        
+        return products.stream()
                 .map(ProductDTO::fromEntity)
                 .collect(Collectors.toList());
     }

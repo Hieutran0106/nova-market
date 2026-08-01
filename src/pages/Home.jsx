@@ -12,15 +12,15 @@ const homeCategories = [
   { name: 'Tivi', slug: 'tivi', image: '/assets/tv.png', icon: Tv },
   { name: 'Laptop', slug: 'laptop', image: '/assets/laptop.png', icon: Laptop },
   { name: 'Điện thoại', slug: 'dien-thoai', image: '/assets/phone.png', icon: Smartphone },
-  { name: 'Máy lạnh', slug: 'may-lanh', image: '/assets/air-conditioner.png', icon: AirVent },
+  { name: 'Máy tính bảng', slug: 'may-tinh-bang', image: '/assets/phone.png', icon: Smartphone },
+  { name: 'Điều hòa', slug: 'dieu-hoa', image: '/assets/air-conditioner.png', icon: AirVent },
   { name: 'Tủ lạnh', slug: 'tu-lanh', image: '/assets/fridge.png', icon: Box },
   { name: 'Máy giặt', slug: 'may-giat', image: '/assets/washer.png', icon: WashingMachine },
-  { name: 'Gia dụng', slug: 'gia-dung', image: '/assets/home-appliance.png', icon: ShoppingBag },
-  { name: 'Phụ kiện', slug: 'phu-kien', image: '/assets/earbuds.png', icon: Headphones },
-  { name: 'Âm thanh', slug: 'am-thanh', image: '/assets/speaker.png', icon: Headphones },
+  { name: 'Máy lọc nước', slug: 'may-loc-nuoc', image: '/assets/home-appliance.png', icon: ShoppingBag },
+  { name: 'Lò vi sóng', slug: 'lo-vi-song', image: '/assets/home-appliance.png', icon: ShoppingBag },
 ];
 
-const tabs = ['Dành cho bạn', 'Tivi', 'Laptop', 'Điện thoại', 'Gia dụng', 'Âm thanh', 'Phụ kiện'];
+const tabs = ['Dành cho bạn', 'Tivi', 'Laptop', 'Điện thoại', 'Tủ lạnh', 'Máy giặt', 'Điều hòa'];
 
 export default function Home() {
   const { products = [], isLoading = false } = useStore();
