@@ -5,7 +5,7 @@ import {
   RefreshCcw, ShieldCheck, ShoppingBag, Smartphone, Sparkles, Tv,
   WashingMachine,
 } from 'lucide-react';
-import { products } from '../data/store';
+import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
 
 const homeCategories = [
@@ -23,6 +23,7 @@ const homeCategories = [
 const tabs = ['Dành cho bạn', 'Tivi', 'Laptop', 'Điện thoại', 'Gia dụng', 'Âm thanh', 'Phụ kiện'];
 
 export default function Home() {
+  const { products = [], isLoading = false } = useStore();
   const [activeTab, setActiveTab] = useState('Dành cho bạn');
 
   const suggested = activeTab === 'Dành cho bạn'

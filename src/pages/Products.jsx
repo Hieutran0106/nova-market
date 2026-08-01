@@ -1,8 +1,9 @@
 import React,{useEffect,useMemo,useState} from 'react';
 import {useNavigate,useSearchParams} from 'react-router-dom';
 import {ChevronLeft,ChevronRight,SlidersHorizontal} from 'lucide-react';
-import {products,categories} from '../data/store';
+import {categories} from '../data/store';
 import ProductCard from '../components/ProductCard';
+import { useStore } from '../context/StoreContext';
 
 const PAGE_SIZE=24;
 const money=value=>new Intl.NumberFormat('vi-VN').format(value)+'đ';
@@ -19,6 +20,7 @@ const categoryBanners={
 };
 
 export default function Products(){
+  const { products } = useStore();
   const navigate=useNavigate();
   const [params,setParams]=useSearchParams();
   const cat=params.get('category')||'Tất cả';
