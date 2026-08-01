@@ -18,7 +18,7 @@ export default function ProductCard({p}){
     <div className="product-tags">{p.tags?.slice(0,2).map(tag=><span key={tag}>{tag}</span>)}</div>
     <div className="rating"><Star size={13} fill="currentColor"/> {p.rating} <span>({p.reviews})</span></div>
     <div className="price">{money(p.price)}</div><div className="old-price">{money(p.oldPrice)}</div>
-    <div className="stock">Còn hàng • Giao nhanh</div>
-    <button aria-label="Thêm vào giỏ hàng" className="cart-add" onClick={()=>addToCart(p.id)}><ShoppingCart size={17}/></button>
+    <div className={`stock ${p.inventoryStatus !== 'Còn hàng' ? 'out-of-stock' : ''}`}>{p.inventoryStatus || 'Còn hàng'}</div>
+    <button aria-label="Thêm vào giỏ hàng" className="cart-add" disabled={p.inventoryStatus !== 'Còn hàng'} onClick={()=>addToCart(p.id)}><ShoppingCart size={17}/></button>
   </article>
 }

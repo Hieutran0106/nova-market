@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Bot, ChevronDown, Minus, Send, Sparkles, X } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
 
 const QUICK_QUESTIONS = [
   'Tư vấn tivi phù hợp',
@@ -8,25 +9,9 @@ const QUICK_QUESTIONS = [
   'Ưu đãi hôm nay có gì?',
 ];
 
-function getAnswer(question) {
-  const text = question.toLocaleLowerCase('vi');
-
-  if (text.includes('laptop')) {
-    return 'Bạn cho mình biết ngành học, ngân sách và có cần chơi game hay không nhé. Với sinh viên CNTT, RAM 16GB và SSD 512GB là mức nên ưu tiên.';
-  }
-  if (text.includes('tivi') || text.includes('tv')) {
-    return 'Bạn cho mình biết khoảng cách xem và diện tích phòng nhé. Phòng khách phổ biến thường phù hợp với TV 55–65 inch.';
-  }
-  if (text.includes('máy giặt')) {
-    return 'Gia đình 4 người nên chọn máy 9–10,5 kg, ưu tiên Inverter và động cơ vận hành êm.';
-  }
-  if (text.includes('ưu đãi') || text.includes('khuyến mãi')) {
-    return 'Hôm nay có trả góp 0%, miễn phí giao hàng toàn quốc và giờ vàng giảm đến 30%.';
-  }
-  return 'Bạn cho mình biết thêm ngân sách, mục đích sử dụng và tiêu chí ưu tiên để mình tư vấn chính xác hơn nhé.';
-}
-
+// Đã xóa getAnswer giả lập để nhường chỗ cho AI thật
 export default function NovaAssistant() {
+  const { user, cartItems } = useStore();
   const [open, setOpen] = useState(true);
   const [minimized, setMinimized] = useState(false);
   const [input, setInput] = useState('');
@@ -43,7 +28,7 @@ export default function NovaAssistant() {
     replyTimersRef.current.forEach(clearTimeout);
   }, []);
 
-  const ask = (value) => {
+  const ask = async (value) => {
     const text = value.trim();
     if (!text) return;
 
@@ -54,15 +39,39 @@ export default function NovaAssistant() {
       { id: requestId, role: 'typing' },
     ]);
     setInput('');
+    
+    // Thu thập thông tin khách hàng (Context)
+    const userContext = user ? {
+      name: user.name,
+      cart: cartItems.map(item => item.product.name)
+    } : null;
 
-    const timer = setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8080/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          seed: text,
+          userContext: userContext 
+        })
+      });
+      
+      const data = await response.json();
+      const reply = data.text || "Lỗi phản hồi từ AI";
+      
       setMessages((current) => current.map((message) => (
         message.id === requestId
-          ? { id: `${requestId}-ai`, role: 'ai', text: getAnswer(text) }
+          ? { id: `${requestId}-ai`, role: 'ai', text: reply }
           : message
       )));
-    }, 700);
-    replyTimersRef.current.push(timer);
+    } catch (error) {
+      console.error("Lỗi kết nối AI:", error);
+      setMessages((current) => current.map((message) => (
+        message.id === requestId
+          ? { id: `${requestId}-ai`, role: 'ai', text: "Xin lỗi, hiện tại mình không thể kết nối với máy chủ AI." }
+          : message
+      )));
+    }
   };
 
   if (!open) {

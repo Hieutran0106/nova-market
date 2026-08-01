@@ -1,12 +1,12 @@
 import React,{useState} from 'react';
 import {Link,useLocation,useNavigate} from 'react-router-dom';
 import {Home,Menu,Search,Phone,User,ShoppingCart,Heart,Scale,X} from 'lucide-react';
-import {categories,products} from '../data/store';
+import {categories} from '../data/store';
 import {useStore} from '../context/StoreContext';
 import NovaAssistant from './NovaAssistant';
 
 export default function Layout({children}){
-  const nav=useNavigate(), location=useLocation(), {cartCount,wishlist,compare,user}=useStore();
+  const nav=useNavigate(), location=useLocation(), {cartCount,wishlist,compare,user,products}=useStore();
   const [q,setQ]=useState(''),[suggest,setSuggest]=useState(false),[mobile,setMobile]=useState(false);
   const matches=q?products.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())).slice(0,5):[];
   const submit=e=>{e.preventDefault();nav(`/products?q=${encodeURIComponent(q)}`);setSuggest(false)};

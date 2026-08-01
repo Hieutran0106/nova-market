@@ -39,4 +39,10 @@ public class Product {
 
     @Column(name = "in_stock")
     private Boolean inStock = true;
+
+    @Column(name = "image_url", columnDefinition = "text")
+    private String imageUrl;
+
+    @Column(name = "inventory_status", length = 50)
+    private String inventoryStatus;
 }
