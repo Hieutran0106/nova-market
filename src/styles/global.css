@@ -383,3 +383,130 @@ img{display:block;max-width:100%}h1,h2,h3,h4,p{overflow-wrap:break-word}.btn,but
   .auth-card{padding:25px 18px}.auth-heading h2{font-size:20px}.auth-field-row{grid-template-columns:1fr}.social-login{grid-template-columns:1fr}
   .account-page{width:calc(100% - 20px)}.account-welcome{padding:20px;align-items:flex-start}.account-welcome>svg{display:none}
 }
+
+
+/* ===== Nova chat UI override ===== */
+
+.nova-chat {
+  width: min(420px, calc(100vw - 24px));
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  height: 390px;
+  max-height: calc(100vh - 190px);
+
+  padding: 8px 5px 12px;
+  margin: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+
+.msg {
+  width: fit-content;
+  max-width: 91%;
+
+  padding: 12px 14px;
+  border-radius: 16px;
+
+  font-size: 13px;
+  line-height: 1.62;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.msg.user {
+  align-self: flex-end;
+  margin: 0;
+
+  color: #ffffff;
+  background: linear-gradient(135deg, #1747d1, #3569ef);
+
+  border-bottom-right-radius: 5px;
+
+  box-shadow: 0 5px 14px rgba(23, 71, 209, 0.18);
+}
+
+.msg.ai {
+  align-self: flex-start;
+  margin: 0;
+
+  color: #1f2937;
+  background: linear-gradient(145deg, #f8faff, #eef3ff);
+
+  border: 1px solid #dce6ff;
+  border-bottom-left-radius: 5px;
+
+  box-shadow: 0 4px 14px rgba(35, 78, 180, 0.07);
+}
+
+.ai-paragraph {
+  margin: 0 0 10px;
+}
+
+.ai-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.ai-heading {
+  margin: 15px 0 8px;
+  padding-left: 10px;
+
+  border-left: 4px solid #2f63e9;
+
+  color: #173c9b;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.ai-heading:first-child {
+  margin-top: 0;
+}
+
+.ai-strong {
+  color: #173c9b;
+  font-weight: 700;
+}
+
+.ai-list,
+.ai-number-list {
+  margin: 7px 0 12px;
+  padding-left: 21px;
+}
+
+.ai-list-item {
+  margin-bottom: 7px;
+  padding-left: 2px;
+}
+
+.ai-list-item:last-child {
+  margin-bottom: 0;
+}
+
+.ai-list-item::marker {
+  color: #2f63e9;
+  font-weight: 700;
+}
+
+.user-message-text {
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .nova-chat {
+    width: auto;
+  }
+
+  .chat-messages {
+    height: calc(100dvh - 176px);
+    max-height: 390px;
+  }
+}

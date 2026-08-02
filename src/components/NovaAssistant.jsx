@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Bot, ChevronDown, Minus, Send, Sparkles, X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useStore } from '../context/StoreContext';
 
 const QUICK_QUESTIONS = [
@@ -132,13 +134,98 @@ export default function NovaAssistant() {
           )}
 
           {messages.length > 0 && (
-            <div className="chat-messages" ref={messageListRef} aria-live="polite">
-              <div className="msg ai">Xin chào! Bạn cần mình tư vấn sản phẩm nào hôm nay?</div>
-              {messages.map((message) => message.role === 'typing'
-                ? <div key={message.id} className="msg ai typing"><i /><i /><i /></div>
-                : <div key={message.id} className={`msg ${message.role}`}>{message.text}</div>)}
-            </div>
-          )}
+  <div
+    className="chat-messages"
+    ref={messageListRef}
+    aria-live="polite"
+  >
+    <div className="msg ai">
+      <p className="ai-paragraph">
+        Xin chào! Bạn cần mình tư vấn sản phẩm nào hôm nay?
+      </p>
+    </div>
+
+    {messages.map((message) => {
+      if (message.role === 'typing') {
+        return (
+          <div
+            key={message.id}
+            className="msg ai typing"
+          >
+            <i />
+            <i />
+            <i />
+          </div>
+        );
+      }
+
+      if (message.role === 'ai') {
+        return (
+          <div
+            key={message.id}
+            className="msg ai"
+          >
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => (
+                  <h3 className="ai-heading">{children}</h3>
+                ),
+
+                h2: ({ children }) => (
+                  <h3 className="ai-heading">{children}</h3>
+                ),
+
+                h3: ({ children }) => (
+                  <h3 className="ai-heading">{children}</h3>
+                ),
+
+                p: ({ children }) => (
+                  <p className="ai-paragraph">{children}</p>
+                ),
+
+                strong: ({ children }) => (
+                  <strong className="ai-strong">
+                    {children}
+                  </strong>
+                ),
+
+                ul: ({ children }) => (
+                  <ul className="ai-list">{children}</ul>
+                ),
+
+                ol: ({ children }) => (
+                  <ol className="ai-number-list">
+                    {children}
+                  </ol>
+                ),
+
+                li: ({ children }) => (
+                  <li className="ai-list-item">
+                    {children}
+                  </li>
+                ),
+              }}
+            >
+              {message.text}
+            </ReactMarkdown>
+          </div>
+        );
+      }
+
+      return (
+        <div
+          key={message.id}
+          className="msg user"
+        >
+          <p className="user-message-text">
+            {message.text}
+          </p>
+        </div>
+      );
+    })}
+  </div>
+)}
 
           <form className="nova-input" onSubmit={(event) => { event.preventDefault(); ask(input); }}>
             <input
