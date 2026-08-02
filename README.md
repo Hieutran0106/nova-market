@@ -11,6 +11,12 @@ Hệ thống AI đã được tích hợp chặt chẽ vào Spring Boot, giúp q
 
 ---
 
+## ⚡ CÀI ĐẶT NHANH (One-Click Install)
+Nếu bạn tải dự án từ GitHub về, bạn không cần phải cài đặt thủ công từng phần. 
+Chỉ cần nháy đúp chuột vào file **`setup.bat`** (dành cho Windows) ở thư mục gốc. Hệ thống sẽ tự động cài đặt toàn bộ thư viện cho Frontend, Backend và cả AI Core (thông qua `requirements.txt`).
+
+---
+
 ## 🏃 2. Cách Chạy Dự Án (Chế độ thông thường)
 Nếu bạn chỉ muốn phát triển Web bình thường (không cần chat với AI), bạn chỉ cần chạy 2 thành phần sau:
 

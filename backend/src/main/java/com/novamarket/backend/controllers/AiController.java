@@ -28,14 +28,21 @@ public class AiController {
     @PostMapping("/generate")
     public ResponseEntity<?> generateResponse(@RequestBody AiGenerateRequest req) {
         try {
-            // Lấy 30 sản phẩm từ DB
-            Page<Product> productPage = productRepository.findAll(PageRequest.of(0, 30));
-            List<Product> products = productPage.getContent();
-
+            // Tìm kiếm 5 sản phẩm sát nghĩa nhất bằng AI Vector Search
+            String AI_SEARCH_URL = "http://localhost:8001/search";
+            Map<String, Object> searchReq = Map.of("query", req.getSeed(), "top_k", 5);
+            ResponseEntity<Map> searchRes = restTemplate.postForEntity(AI_SEARCH_URL, searchReq, Map.class);
+            
             StringBuilder inventory = new StringBuilder();
-            for (Product p : products) {
-                inventory.append(String.format("- %s %s %s: Giá %,d VNĐ. Điểm nổi bật: %s\n",
-                        p.getCategory(), p.getBrand(), p.getModelName(), p.getPriceVnd(), p.getKeyFeatures()));
+            if (searchRes.getStatusCode().is2xxSuccessful() && searchRes.getBody() != null) {
+                List<String> results = (List<String>) searchRes.getBody().get("results");
+                if (results != null && !results.isEmpty()) {
+                    for (String res : results) {
+                        inventory.append(res).append("\n");
+                    }
+                } else {
+                    inventory.append("Hiện tại cửa hàng không có sản phẩm nào trực tiếp phù hợp với yêu cầu.\n");
+                }
             }
 
             // Tạo đoạn Context Khách hàng (nếu có)
