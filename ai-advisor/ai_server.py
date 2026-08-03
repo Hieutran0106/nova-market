@@ -24,24 +24,28 @@ DB_CONFIG = {
 AI_CORE_URL = "http://localhost:8001/generate"
 print(f"✅ Đã cấu hình kết nối tới AI Core tại: {AI_CORE_URL}")
 
-def fetch_products():
-    """Lấy danh sách sản phẩm từ PostgreSQL để làm 'Sách giáo khoa' cho AI"""
+def fetch_products(query: str):
+    """Tìm kiếm sản phẩm liên quan từ AI Core (RAG) thay vì lấy bừa 30 cái đầu tiên"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        cursor = conn.cursor()
-        cursor.execute("SELECT category, brand, model_name, price_vnd, key_features FROM products LIMIT 30")
-        rows = cursor.fetchall()
-        
-        inventory = ""
-        for row in rows:
-            inventory += f"- {row[0]} {row[1]} {row[2]}: Giá {row[3]:,} VNĐ. Điểm nổi bật: {row[4]}\n"
-        
-        cursor.close()
-        conn.close()
-        return inventory
+        req = urllib.request.Request(
+            "http://localhost:8001/search",
+            data=json.dumps({"query": query, "top_k": 15}).encode('utf-8'),
+            headers={'Content-Type': 'application/json'}
+        )
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            results = data.get('results', [])
+            
+            if not results:
+                return "Không tìm thấy sản phẩm nào phù hợp."
+                
+            inventory = ""
+            for item in results:
+                inventory += f"- {item}\n"
+            return inventory
     except Exception as e:
-        print(f"Lỗi lấy dữ liệu SQL: {e}")
-        return "Không có thông tin sản phẩm do lỗi kết nối Database."
+        print(f"Lỗi gọi Search API: {e}")
+        return "Không có thông tin sản phẩm do lỗi kết nối tìm kiếm."
 
 # 2. Xây dựng Server API
 class SmartAIHandler(http.server.SimpleHTTPRequestHandler):
@@ -62,8 +66,8 @@ class SmartAIHandler(http.server.SimpleHTTPRequestHandler):
                 user_msg = req.get('seed', '')
                 user_context = req.get('userContext', None)
                 
-                # BƯỚC 1: Rút trích dữ liệu từ SQL
-                db_context = fetch_products()
+                # BƯỚC 1: Tìm kiếm sản phẩm thông minh (Vector Search)
+                db_context = fetch_products(user_msg)
                 
                 # Tạo đoạn Context Khách hàng (nếu có)
                 customer_context_str = ""
@@ -75,7 +79,7 @@ class SmartAIHandler(http.server.SimpleHTTPRequestHandler):
 [THÔNG TIN KHÁCH HÀNG ĐANG CHAT]
 - Tên khách hàng: {name}
 - Các sản phẩm đang nằm trong giỏ hàng của {name}: {cart_str}
-=> LƯU Ý QUAN TRỌNG: Hãy xưng hô bằng tên của khách hàng ({name}) để tạo sự thân thiện. Chủ động nhắc đến các sản phẩm trong giỏ hàng nếu thấy phù hợp với câu hỏi của họ, hỏi xem họ có cần tư vấn thêm về các món đồ trong giỏ không.
+=> LƯU Ý VỀ GIỎ HÀNG: Chỉ nhắc đến giỏ hàng nếu nó thực sự liên quan hoặc khách hàng hỏi về nó. TUYỆT ĐỐI KHÔNG nhầm lẫn loại sản phẩm trong giỏ hàng với sản phẩm khách đang tìm kiếm (Ví dụ: Khách đang tìm điện thoại, nhưng giỏ hàng có Laptop, thì không được gọi Laptop là điện thoại). Không tự bịa ra cấu hình của sản phẩm trong giỏ hàng.
 """
 
                 # BƯỚC 2: Định hình Nhân cách và nhồi Kiến thức cho AI (System Prompt)
@@ -83,13 +87,17 @@ class SmartAIHandler(http.server.SimpleHTTPRequestHandler):
 Nhiệm vụ của bạn không chỉ là bán hàng, mà là lắng nghe và giải quyết vấn đề của khách hàng.
 Hãy tuân thủ các nguyên tắc sau:
 1. Đồng cảm: Luôn thể hiện sự quan tâm đến nhu cầu hoặc khó khăn của họ (VD: "Mình hiểu {user_context.get('name', 'bạn') if user_context else 'bạn'} đang tìm một chiếc máy mỏng nhẹ...").
-2. Khai thác nhu cầu: Nếu khách yêu cầu chung chung, hãy khéo léo hỏi thêm về ngân sách, sở thích, hoặc mục đích sử dụng.
-3. Tư vấn cá nhân hóa: Giải thích rõ "TẠI SAO" sản phẩm này lại hợp với họ, đánh trúng vào tâm lý và mong muốn.
+2. Chủ động tư vấn: Không hỏi ngược lại khách hàng quá nhiều. Nếu khách hỏi sản phẩm không có sẵn (VD: iPhone 17), hãy TỰ ĐỘNG chọn 1-2 sản phẩm tốt nhất trong TỒN KHO để giới thiệu ngay lập tức kèm theo giá bán và điểm nổi bật, thay vì chỉ hỏi "bạn có muốn xem mẫu khác không".
+3. Tư vấn cá nhân hóa: Giải thích rõ "TẠI SAO" sản phẩm gợi ý lại hợp với họ.
 4. Giọng điệu: Thân thiện, xưng "mình" và gọi khách bằng tên của họ, dùng emoji một cách chừng mực để tạo sự gần gũi.
+5. Ngắn gọn & Không lặp lại: Chỉ liệt kê thông số hoặc tính năng 1 lần duy nhất. Trả lời đúng trọng tâm. Hạn chế kết thúc bằng một câu hỏi.
+6. TUYỆT ĐỐI TÔN TRỌNG NGÂN SÁCH: Nếu khách hàng nói ngân sách là X, tuyệt đối KHÔNG GỢI Ý các sản phẩm có giá cao hơn X. Ví dụ: Khách có 22 triệu, không được gợi ý sản phẩm 39 triệu. Không được nói dối về giá tiền.
+7. NGÔN NGỮ: Tuyệt đối CHỈ SỬ DỤNG TIẾNG VIỆT 100%. Không bao giờ được phép sử dụng tiếng Trung (Chinese) hay tiếng Anh trong câu trả lời.
+8. CHỐNG BỊA ĐẶT (QUAN TRỌNG NHẤT): CHỈ ĐƯỢC PHÉP giới thiệu các sản phẩm CÓ TRONG DANH SÁCH TỒN KHO BÊN DƯỚI. Tuyệt đối KHÔNG ĐƯỢC bịa ra tên sản phẩm, cấu hình, hay mức giá không có trong danh sách. Nếu không có sản phẩm nào phù hợp trong danh sách, hãy thật thà nói "Hiện tại cửa hàng không có sản phẩm nào phù hợp".
 {customer_context_str}
 Dưới đây là danh sách sản phẩm TỒN KHO THỰC TẾ:
 {db_context}
-(Tuyệt đối KHÔNG bịa ra sản phẩm hay mức giá không có trong danh sách trên)."""
+(BẠN SẼ BỊ PHẠT NẶNG NẾU TỰ BỊA RA SẢN PHẨM KHÔNG CÓ TRONG DANH SÁCH NÀY)."""
 
                 # BƯỚC 3 & 4: Yêu cầu sinh văn bản từ AI Core
                 payload = {

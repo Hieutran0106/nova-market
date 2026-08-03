@@ -38,21 +38,70 @@ export function Account(){
     </div>
   </div>;
 
-  const submit=event=>{
+  const submit = async event => {
     event.preventDefault();
-    if(mode==='login'){
-      if(!form.identity.trim()||form.password.length<6){setError('Vui lòng nhập tài khoản và mật khẩu tối thiểu 6 ký tự.');return}
-      const isEmail=form.identity.includes('@');
-      setUser({name:isEmail?form.identity.split('@')[0]:'Khách hàng Nova',email:isEmail?form.identity:'',phone:isEmail?'':form.identity});
-      notify('Đăng nhập thành công');
+    if(mode === 'login'){
+      if(!form.identity.trim() || form.password.length < 6){
+        setError('Vui lòng nhập tài khoản và mật khẩu tối thiểu 6 ký tự.');
+        return;
+      }
+      try {
+        const res = await fetch('http://localhost:8080/api/auth/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({identity: form.identity, password: form.password})
+        });
+        const data = await res.json();
+        if(res.ok){
+          setUser(data.user);
+          notify(data.message);
+        } else {
+          setError(data.message || 'Đăng nhập thất bại');
+        }
+      } catch (err) {
+        setError('Không thể kết nối đến máy chủ');
+      }
       return;
     }
-    if(!form.name.trim()||!form.phone.trim()||!form.email.trim()){setError('Vui lòng điền đầy đủ thông tin bắt buộc.');return}
-    if(form.password.length<6){setError('Mật khẩu cần có ít nhất 6 ký tự.');return}
-    if(form.password!==form.confirm){setError('Mật khẩu xác nhận chưa trùng khớp.');return}
-    if(!form.agree){setError('Bạn cần đồng ý với điều khoản sử dụng.');return}
-    setUser({name:form.name,email:form.email,phone:form.phone});
-    notify('Đăng ký thành công');
+    
+    if(!form.name.trim() || !form.phone.trim() || !form.email.trim()){
+      setError('Vui lòng điền đầy đủ thông tin bắt buộc.');
+      return;
+    }
+    if(form.password.length < 6){
+      setError('Mật khẩu cần có ít nhất 6 ký tự.');
+      return;
+    }
+    if(form.password !== form.confirm){
+      setError('Mật khẩu xác nhận chưa trùng khớp.');
+      return;
+    }
+    if(!form.agree){
+      setError('Bạn cần đồng ý với điều khoản sử dụng.');
+      return;
+    }
+    
+    try {
+      const res = await fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          password: form.password
+        })
+      });
+      const data = await res.json();
+      if(res.ok){
+        setUser(data.user);
+        notify(data.message);
+      } else {
+        setError(data.message || 'Đăng ký thất bại');
+      }
+    } catch (err) {
+      setError('Không thể kết nối đến máy chủ');
+    }
   };
 
   return <div className="container auth-page">

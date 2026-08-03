@@ -15,6 +15,7 @@ const QUICK_QUESTIONS = [
 export default function NovaAssistant() {
   const { user, cartItems } = useStore();
   const [open, setOpen] = useState(true);
+  const [guestProfile, setGuestProfile] = useState('');
   const [minimized, setMinimized] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
@@ -25,6 +26,32 @@ export default function NovaAssistant() {
     const list = messageListRef.current;
     if (list) list.scrollTop = list.scrollHeight;
   }, [messages]);
+
+  // Load tin nhắn theo user khi đăng nhập/đăng xuất
+  useEffect(() => {
+    if (user && user.email) {
+      const saved = localStorage.getItem(`nova_chat_${user.email}`);
+      if (saved) {
+        try {
+          setMessages(JSON.parse(saved));
+        } catch(e) {
+          setMessages([]);
+        }
+      } else {
+        setMessages([]);
+      }
+    } else {
+      // Khi không đăng nhập, xóa tin nhắn (chỉ lưu trên RAM)
+      setMessages([]);
+    }
+  }, [user]);
+
+  // Lưu tin nhắn khi có thay đổi (nếu đã đăng nhập)
+  useEffect(() => {
+    if (user && user.email) {
+      localStorage.setItem(`nova_chat_${user.email}`, JSON.stringify(messages));
+    }
+  }, [messages, user]);
 
   useEffect(() => () => {
     replyTimersRef.current.forEach(clearTimeout);
@@ -45,8 +72,18 @@ export default function NovaAssistant() {
     // Thu thập thông tin khách hàng (Context)
     const userContext = user ? {
       name: user.name,
+      email: user.email,
+      phone: user.phone,
       cart: cartItems.map(item => item.product.name)
-    } : null;
+    } : {
+      name: 'bạn',
+      profile: guestProfile,
+      cart: cartItems.map(item => item.product.name)
+    };
+
+    const history = messages
+      .filter(m => m.role !== 'typing')
+      .map(m => ({ role: m.role, text: m.text }));
 
     try {
       const response = await fetch('http://localhost:8080/api/generate', {
@@ -54,11 +91,16 @@ export default function NovaAssistant() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           seed: text,
+          history: history,
           userContext: userContext 
         })
       });
       
       const data = await response.json();
+      
+      if(data.profile && !user){
+        setGuestProfile(data.profile);
+      }
       const reply = data.text || "Lỗi phản hồi từ AI";
       
       setMessages((current) => current.map((message) => (
