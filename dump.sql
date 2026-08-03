@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict hPeFfOEXk0cSCtqoWe76V5itaab4ZwjjvG8zzQ4pdQ1g92Ent13yviBMakYa52w
+\restrict f0lyeNx0Q8Z97raeorRw11RWCmtw58iFYmCv3vucDPiaclZahGGoUKbdW9u9GDh
 
 -- Dumped from database version 18.0
 -- Dumped by pg_dump version 18.0
@@ -32,7 +32,7 @@ CREATE TABLE public.customer_profiles (
     user_id character varying(100),
     extracted_budget bigint,
     extracted_room_size integer,
-    preferences jsonb,
+    preferences text,
     loyalty_score integer,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
@@ -70,7 +70,9 @@ CREATE TABLE public.customers (
     user_id character varying(100) NOT NULL,
     full_name character varying(100),
     phone character varying(20),
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    email character varying(100),
+    password character varying(255)
 );
 
 
@@ -361,6 +363,7 @@ ALTER TABLE ONLY public.shopping_cart ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 COPY public.customer_profiles (id, user_id, extracted_budget, extracted_room_size, preferences, loyalty_score, updated_at) FROM stdin;
+1	33b1a337-0ae8-46cb-a6fe-07e8d217d882	\N	\N	{"budget": "Cần xác định", "intent": "Mua tivi", "persona": "Người tiêu dùng"}	\N	2026-08-03 09:31:24.156643
 \.
 
 
@@ -368,10 +371,11 @@ COPY public.customer_profiles (id, user_id, extracted_budget, extracted_room_siz
 -- Data for Name: customers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.customers (user_id, full_name, phone, created_at) FROM stdin;
-user_001	Nguyễn Văn A	0901234567	2026-07-31 15:42:29.6018
-user_002	Trần Thị B	0912345678	2026-07-31 15:42:29.6018
-user_003	Lê Văn C	0923456789	2026-07-31 15:42:29.6018
+COPY public.customers (user_id, full_name, phone, created_at, email, password) FROM stdin;
+user_001	Nguyễn Văn A	0901234567	2026-07-31 15:42:29.6018	\N	\N
+user_002	Trần Thị B	0912345678	2026-07-31 15:42:29.6018	\N	\N
+user_003	Lê Văn C	0923456789	2026-07-31 15:42:29.6018	\N	\N
+33b1a337-0ae8-46cb-a6fe-07e8d217d882	Nguyễn Quang Thiện	+84329584430	2026-08-03 09:12:08.729972	nguyenquangthien1132005@gmail.com	1132005
 \.
 
 
@@ -3140,7 +3144,7 @@ COPY public.shopping_cart (id, user_id, product_id, quantity, added_at) FROM std
 -- Name: customer_profiles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.customer_profiles_id_seq', 1, false);
+SELECT pg_catalog.setval('public.customer_profiles_id_seq', 1, true);
 
 
 --
@@ -3349,5 +3353,5 @@ ALTER TABLE ONLY public.shopping_cart
 -- PostgreSQL database dump complete
 --
 
-\unrestrict hPeFfOEXk0cSCtqoWe76V5itaab4ZwjjvG8zzQ4pdQ1g92Ent13yviBMakYa52w
+\unrestrict f0lyeNx0Q8Z97raeorRw11RWCmtw58iFYmCv3vucDPiaclZahGGoUKbdW9u9GDh
 

@@ -38,18 +38,26 @@ npm run dev
 ---
 
 ## 🧠 3. Cách Bật Trợ Lý AI (Khi cần test chat)
-Khi bạn muốn tính năng Nova Assistant (Cửa sổ chat góc dưới bên phải) hoạt động, bạn chỉ cần khởi động bộ não AI Core. Backend Spring Boot sẽ tự động móc nối dữ liệu Database và gửi sang cho AI.
+Khi bạn muốn tính năng Nova Assistant hoạt động, bạn cần khởi động 2 module AI: AI Core (chạy mô hình ngôn ngữ) và AI Advisor (chịu trách nhiệm logic).
 
+### Bước 3.1: Khởi động AI Core (Máy chủ Mô hình)
 Mở thêm một tab Terminal **MỚI**, di chuyển vào thư mục `ai-core` và khởi động script:
 ```bash
 cd ai-core
 python ai_service.py
 ```
-*(AI Core sẽ chạy ở cổng `http://localhost:8001`. Nó sẽ tự động nạp mô hình Qwen 1.5B vào VRAM của Card đồ họa RTX 3050 Ti)*
+*(AI Core sẽ chạy ở cổng `http://localhost:8001`. Nó sẽ tự động nạp mô hình ngôn ngữ `Qwen2.5-3B-Instruct (GGUF - Q4_K_M)` và mô hình tìm kiếm ngữ nghĩa `paraphrase-multilingual-MiniLM-L12-v2` vào VRAM của Card đồ họa)*
+**Lưu ý:** Lần đầu khởi chạy `ai_service.py` có thể mất thời gian để hệ thống tải mô hình ngôn ngữ và mô hình nhúng tiếng Việt về máy. Khi màn hình hiện `Đã kích hoạt lõi AI` nghĩa là AI Core đã sẵn sàng!
 
-**Lưu ý:** Lần đầu khởi chạy `ai_service.py` có thể mất từ 10 - 20 giây để hệ thống tải mô hình AI nặng hàng GB vào Card đồ họa. Khi màn hình hiện dòng chữ `INFO: Application startup complete` nghĩa là AI đã sẵn sàng phục vụ!
+### Bước 3.2: Khởi động AI Advisor (Máy chủ Logic)
+Mở thêm một tab Terminal **MỚI**, di chuyển vào thư mục `ai-advisor` và chạy:
+```bash
+cd ai-advisor
+python ai_server.py
+```
+*(AI Advisor sẽ chạy ở cổng `http://localhost:8000`. Spring Boot Backend ở cổng 8080 sẽ gọi qua cổng này để lấy câu trả lời tư vấn cho Frontend)*
 
 ---
 
 ## 🗑️ Dọn Dẹp (Tùy chọn)
-Thư mục `ai-advisor` cũ hiện tại đã được gộp logic vào Spring Boot Backend. Bạn có thể xóa thư mục này đi để dự án nhẹ nhàng hơn.
+Trong quá trình phát triển, nếu bạn đã gộp hoàn toàn logic của `ai-advisor` vào Spring Boot Backend, bạn có thể bỏ qua Bước 3.2 và trỏ trực tiếp Java sang `ai-core` ở cổng `8001`. Tuy nhiên hiện tại hệ thống vẫn đang dựa vào Python `ai_server.py` làm trung gian xử lý Prompt.
