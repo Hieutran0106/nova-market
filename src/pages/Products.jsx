@@ -56,6 +56,22 @@ export default function Products(){
   const visible=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
   const changeCategory=next=>next==='Tất cả'?navigate('/'):setParams({category:next});
   const banner=categoryBanners[cat]||['/assets/hero-nova-retail-v2.png','ĐIỆN MÁY NOVA','Chọn đúng sản phẩm, mua đúng giá','Hơn 100 sản phẩm'];
+  
+  const getPaginationGroup = () => {
+    let pages = [];
+    if (pageCount <= 7) {
+      for (let i = 1; i <= pageCount; i++) pages.push(i);
+    } else {
+      if (page <= 4) {
+        pages = [1, 2, 3, 4, 5, '...', pageCount];
+      } else if (page >= pageCount - 3) {
+        pages = [1, '...', pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1, pageCount];
+      } else {
+        pages = [1, '...', page - 1, page, page + 1, '...', pageCount];
+      }
+    }
+    return pages;
+  };
 
   return <>
     <section className={`catalog-hero category-tone-${Math.max(0,categories.findIndex(item=>item.name===cat)+1)}`} style={{'--category-banner':`url("${banner[0]}")`}}>
@@ -102,7 +118,13 @@ export default function Products(){
           {visible.length?<div className="product-grid four">{visible.map(product=><ProductCard key={product.id} p={product}/>)}</div>:<div className="empty">Không có sản phẩm phù hợp với bộ lọc.</div>}
           {pageCount>1&&<nav className="pagination" aria-label="Phân trang">
             <button disabled={page===1} onClick={()=>setPage(value=>value-1)}><ChevronLeft size={16}/></button>
-            {Array.from({length:pageCount},(_,index)=>index+1).map(number=><button key={number} className={page===number?'active':''} onClick={()=>setPage(number)}>{number}</button>)}
+            {getPaginationGroup().map((item, index) => 
+              item === '...' ? (
+                <span key={`ellipsis-${index}`} className="ellipsis" style={{padding: '0 8px', alignSelf: 'center'}}>...</span>
+              ) : (
+                <button key={item} className={page===item?'active':''} onClick={()=>setPage(item)}>{item}</button>
+              )
+            )}
             <button disabled={page===pageCount} onClick={()=>setPage(value=>value+1)}><ChevronRight size={16}/></button>
           </nav>}
         </section>

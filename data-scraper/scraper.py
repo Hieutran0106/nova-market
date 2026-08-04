@@ -57,16 +57,28 @@ def download_image(url, filename):
 
 def scrape_dienmayxanh_all():
     print("🚀 Bắt đầu quá trình cào TOÀN BỘ dữ liệu và tải hình ảnh...")
-    all_products = []
     
     if not os.path.exists(IMAGE_SAVE_DIR):
         os.makedirs(IMAGE_SAVE_DIR)
         print(f"📁 Đã tạo thư mục lưu ảnh: {IMAGE_SAVE_DIR}")
+        
+    csv_file = "database_dmx.csv"
+    fieldnames = ["category", "brand", "model_name", "price_vnd", "image_url", "inventory_status", "technical_specs", "service_packages", "promotions", "online_payment_offers"]
+    
+    # Khởi tạo file CSV và ghi header
+    with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+    
+    total_products_scraped = 0
     
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         page = browser.new_page()
         page.set_extra_http_headers({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"})
+        
+        detail_page = browser.new_page()
+        detail_page.set_extra_http_headers({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"})
         
         for category in CATEGORIES:
             cat_name = category["name"]
@@ -75,21 +87,36 @@ def scrape_dienmayxanh_all():
             print(f"📦 Đang cào danh mục: {cat_name}")
             print(f"==============================================")
             
+            all_products = [] # Reset danh sách sản phẩm cho mỗi danh mục
+            
             try:
                 page.goto(url, timeout=60000)
                 time.sleep(3)
                 
                 click_count = 0
+                last_count = 0
+                stuck_count = 0
                 while True:
                     page.mouse.wheel(0, 3000)
-                    time.sleep(1)
+                    time.sleep(1.5)
                     try:
                         view_more_btn = page.locator(".view-more").first
                         if view_more_btn.is_visible(timeout=2000):
                             view_more_btn.click()
                             click_count += 1
                             print(f"  👉 Đã bấm nút 'Xem thêm' lần {click_count}...")
-                            time.sleep(2)
+                            time.sleep(3.5) # Chờ server phản hồi
+                            
+                            # Kiểm tra xem có load thêm sản phẩm không để tránh bị treo
+                            current_count = page.locator("ul.listproduct li.item").count()
+                            if current_count == last_count:
+                                stuck_count += 1
+                                if stuck_count >= 3:
+                                    print("  ⚠️ Nút 'Xem thêm' bị lag hoặc đã hết sản phẩm, dừng cuộn.")
+                                    break
+                            else:
+                                stuck_count = 0
+                                last_count = current_count
                         else:
                             break
                     except Exception:
@@ -151,6 +178,39 @@ def scrape_dienmayxanh_all():
                             if len(ext) > 4 or '?' in ext: ext = 'jpg'
                             filename = f"{safe_name}.{ext}"
                             local_image_path = download_image(img_url, filename)
+
+                        # Trích xuất dữ liệu chi tiết
+                        technical_specs = ""
+                        service_packages = ""
+                        promotions = ""
+                        online_payment_offers = ""
+                        
+                        try:
+                            product_href = el.locator("a.main-contain").first.get_attribute("href")
+                            if product_href:
+                                detail_url = "https://www.dienmayxanh.com" + product_href if not product_href.startswith("http") else product_href
+                                print(f"    > Đang lấy chi tiết: {name} ...")
+                                detail_page.goto(detail_url, timeout=30000)
+                                time.sleep(1.5)
+                                
+                                try:
+                                    technical_specs = detail_page.locator(".parameter").inner_text(timeout=1000).replace('\n', ' | ')
+                                except:
+                                    pass
+                                try:
+                                    promotions = detail_page.locator(".pr-top").first.inner_text(timeout=1000).replace('\n', ' | ')
+                                except:
+                                    pass
+                                try:
+                                    online_payment_offers = detail_page.locator(".pr-bottom").first.inner_text(timeout=1000).replace('\n', ' | ')
+                                except:
+                                    pass
+                                try:
+                                    service_packages = detail_page.locator(".policy").inner_text(timeout=1000).replace('\n', ' | ')
+                                except:
+                                    pass
+                        except Exception as detail_err:
+                            print(f"    > Lỗi lấy chi tiết {name}: {detail_err}")
                             
                         all_products.append({
                             "category": cat_name,
@@ -158,7 +218,11 @@ def scrape_dienmayxanh_all():
                             "model_name": name,
                             "price_vnd": price,
                             "image_url": local_image_path,
-                            "inventory_status": inventory_status
+                            "inventory_status": inventory_status,
+                            "technical_specs": technical_specs,
+                            "service_packages": service_packages,
+                            "promotions": promotions,
+                            "online_payment_offers": online_payment_offers
                         })
                         cat_product_count += 1
                         
@@ -167,21 +231,20 @@ def scrape_dienmayxanh_all():
                 
                 print(f"✨ Trích xuất và tải ảnh thành công {cat_product_count} sản phẩm cho {cat_name}.")
                 
+                # Lưu dữ liệu của danh mục này ngay lập tức
+                if all_products:
+                    with open(csv_file, mode='a', newline='', encoding='utf-8') as file:
+                        writer = csv.DictWriter(file, fieldnames=fieldnames)
+                        writer.writerows(all_products)
+                    total_products_scraped += len(all_products)
+                    print(f"💾 Đã lưu {len(all_products)} sản phẩm của danh mục {cat_name} vào CSV.")
+                
             except Exception as e:
                 print(f"❌ Lỗi khi cào danh mục {cat_name}: {e}")
 
         browser.close()
         
-        if all_products:
-            csv_file = "database_dmx.csv"
-            with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
-                writer = csv.DictWriter(file, fieldnames=["category", "brand", "model_name", "price_vnd", "image_url", "inventory_status"])
-                writer.writeheader()
-                writer.writerows(all_products)
-            
-            print(f"HOÀN TẤT!")
-        else:
-            print("❌ Không cào được sản phẩm nào.")
+        print(f"HOÀN TẤT! Đã cào tổng cộng {total_products_scraped} sản phẩm.")
 
 if __name__ == "__main__":
     scrape_dienmayxanh_all()

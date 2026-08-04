@@ -45,4 +45,19 @@ public class Product {
 
     @Column(name = "inventory_status", length = 50)
     private String inventoryStatus;
+
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
+
+    @Column(name = "technical_specs", columnDefinition = "text")
+    private String technicalSpecs;
+
+    @Column(name = "service_packages", columnDefinition = "text")
+    private String servicePackages;
+
+    @Column(name = "promotions", columnDefinition = "text")
+    private String promotions;
+
+    @Column(name = "online_payment_offers", columnDefinition = "text")
+    private String onlinePaymentOffers;
 }

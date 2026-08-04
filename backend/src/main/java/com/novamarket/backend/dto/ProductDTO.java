@@ -28,6 +28,10 @@ public class ProductDTO {
     private List<String> tags;
     private String shortDesc;
     private Map<String, Object> specs;
+    private String technicalSpecs;
+    private String servicePackages;
+    private String promotions;
+    private String onlinePaymentOffers;
 
     public static ProductDTO fromEntity(Product product) {
         ProductDTO dto = new ProductDTO();
@@ -46,8 +50,8 @@ public class ProductDTO {
         
         dto.setRating(4.0 + (product.getId() % 10) / 10.0);
         dto.setReviews(50 + (product.getId() * 7 % 200));
-        dto.setStock(product.getInStock() ? 10 + (product.getId() % 50) : 0);
-        dto.setInventoryStatus(product.getInventoryStatus() != null ? product.getInventoryStatus() : (product.getInStock() ? "Còn hàng" : "Hết hàng"));
+        dto.setStock(product.getStockQuantity() != null ? product.getStockQuantity() : 0);
+        dto.setInventoryStatus(product.getInventoryStatus() != null ? product.getInventoryStatus() : (dto.getStock() > 0 ? "Còn hàng" : "Hết hàng"));
         
         // Assign default image based on category or use the scraped image
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
@@ -77,6 +81,11 @@ public class ProductDTO {
         } else {
             dto.setSpecs(new HashMap<>());
         }
+        
+        dto.setTechnicalSpecs(product.getTechnicalSpecs());
+        dto.setServicePackages(product.getServicePackages());
+        dto.setPromotions(product.getPromotions());
+        dto.setOnlinePaymentOffers(product.getOnlinePaymentOffers());
         
         return dto;
     }

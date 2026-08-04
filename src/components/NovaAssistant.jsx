@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Bot, ChevronDown, Minus, Send, Sparkles, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 
 const QUICK_QUESTIONS = [
@@ -247,6 +248,12 @@ export default function NovaAssistant() {
                     {children}
                   </li>
                 ),
+                a: ({ children, href }) => {
+                  if (href && href.startsWith('/')) {
+                    return <Link to={href} className="ai-product-link-btn">{children}</Link>;
+                  }
+                  return <a href={href} className="ai-product-link-btn" target="_blank" rel="noopener noreferrer">{children}</a>;
+                }
               }}
             >
               {message.text}

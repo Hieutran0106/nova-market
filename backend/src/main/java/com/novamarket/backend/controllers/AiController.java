@@ -115,6 +115,7 @@ Dưới đây là danh sách 5 sản phẩm TỒN KHO THỰC TẾ (do hệ thố
 LỆNH BẮT BUỘC (CRITICAL): 
 - CHỈ ĐƯỢC PHÉP tư vấn và đề xuất các sản phẩm có mặt trong danh sách TỒN KHO THỰC TẾ ở trên.
 - TUYỆT ĐỐI KHÔNG tự bịa ra sản phẩm, cấu hình, hay mức giá khác không có trong danh sách. (Ví dụ: Không được tự ý đưa ra một chiếc máy 2.5 triệu nếu trong danh sách không có).
+- Khi bạn gợi ý tên một sản phẩm, HÃY CUNG CẤP KÈM Link sản phẩm được cung cấp sẵn trong danh sách bằng cú pháp Markdown, ví dụ: [Xem chi tiết](/product/ten-san-pham-slug).
 - Nếu trong danh sách TỒN KHO KHÔNG CÓ sản phẩm nào đáp ứng đúng tầm giá (ví dụ: khách đòi 18-22 triệu mà kho toàn 24-25 triệu), HÃY THÀNH THẬT XIN LỖI LÀ KHÔNG CÓ, và gợi ý khách các mẫu ở mức giá gần nhất CÓ TRONG KHO.""", name, customerContextStr, inventory.toString());
 
             AiCoreRequest coreReq = new AiCoreRequest();

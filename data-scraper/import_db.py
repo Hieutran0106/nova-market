@@ -29,6 +29,10 @@ def import_csv_to_postgres():
         try:
             cur.execute("ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;")
             cur.execute("ALTER TABLE products ADD COLUMN IF NOT EXISTS inventory_status VARCHAR(50);")
+            cur.execute("ALTER TABLE products ADD COLUMN IF NOT EXISTS technical_specs TEXT;")
+            cur.execute("ALTER TABLE products ADD COLUMN IF NOT EXISTS service_packages TEXT;")
+            cur.execute("ALTER TABLE products ADD COLUMN IF NOT EXISTS promotions TEXT;")
+            cur.execute("ALTER TABLE products ADD COLUMN IF NOT EXISTS online_payment_offers TEXT;")
             conn.commit()
         except Exception as e:
             conn.rollback()
@@ -49,8 +53,8 @@ def import_csv_to_postgres():
                 in_stock = True if row['inventory_status'] == 'Còn hàng' else False
                 
                 cur.execute("""
-                    INSERT INTO products (category, brand, model_name, price_vnd, in_stock, image_url, inventory_status)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO products (category, brand, model_name, price_vnd, in_stock, image_url, inventory_status, technical_specs, service_packages, promotions, online_payment_offers)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     row['category'],
                     row['brand'],
@@ -58,7 +62,11 @@ def import_csv_to_postgres():
                     int(row['price_vnd']),
                     in_stock,
                     row['image_url'],
-                    row['inventory_status']
+                    row['inventory_status'],
+                    row.get('technical_specs', ''),
+                    row.get('service_packages', ''),
+                    row.get('promotions', ''),
+                    row.get('online_payment_offers', '')
                 ))
                 count += 1
                 

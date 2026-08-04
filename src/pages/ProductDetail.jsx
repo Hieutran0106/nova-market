@@ -6,6 +6,67 @@ export default function ProductDetail(){
   const p=products.find(x=>x.slug===slug);
   if(!p)return <div className="container empty">Không tìm thấy sản phẩm.</div>;
   const related=products.filter(x=>x.category===p.category&&x.id!==p.id).slice(0,4);
-return <div className="container detail-page"><div className="breadcrumbs">Trang chủ / {p.category} / {p.name}</div><section className="detail-card"><div className="detail-gallery"><img src={p.image}/><div className="thumbs"><img src={p.image}/><img src={p.image}/><img src={p.image}/></div></div><div className="detail-info"><span className="detail-badge">-{p.discount}%</span><h1>{p.name}</h1><div className="rating"><Star size={15} fill="currentColor"/> {p.rating} <span>({p.reviews} đánh giá)</span></div><p>{p.short}</p><div className="detail-price">{money(p.price)}</div><div className="old-price">{money(p.oldPrice)}</div><div className="benefit-box"><b>Ưu đãi khi mua hôm nay</b><p>✓ Giảm thêm khi thanh toán online</p><p>✓ Trả góp 0% qua thẻ tín dụng</p><p>✓ Miễn phí giao hàng theo điều kiện</p></div><div className="detail-actions"><button className="btn primary" onClick={()=>addToCart(p.id)}><ShoppingCart/> Thêm vào giỏ</button><button onClick={()=>toggleWishlist(p.id)}><Heart/> Yêu thích</button><button onClick={()=>toggleCompare(p.id)}><Scale/> So sánh</button></div></div></section>
-<section className="detail-sections"><article><h2>Thông số kỹ thuật</h2>{Object.entries(p.specs).map(([k,v])=><div className="spec-row" key={k}><span>{k}</span><b>{v}</b></div>)}</article><article><h2>Mô tả sản phẩm</h2><p>{p.short}</p><p>Sản phẩm được phân phối chính hãng, hỗ trợ giao hàng toàn quốc và áp dụng chính sách bảo hành theo nhà sản xuất.</p><h3>Đánh giá khách hàng</h3>{reviews.map((r,i)=><div className="review-line" key={i}><b>{r.name}</b><span>★★★★★</span><p>{r.content}</p></div>)}</article></section>
-{related.length>0&&<section className="section"><div className="section-head"><h2>SẢN PHẨM LIÊN QUAN</h2></div><div className="product-grid four">{related.map(x=><ProductCard key={x.id} p={x}/>)}</div></section>}</div>}
+return (
+    <div className="container detail-page">
+      <div className="breadcrumbs">Trang chủ / {p.category} / {p.name}</div>
+      <section className="detail-card">
+        <div className="detail-gallery">
+          <img src={p.image}/>
+          <div className="thumbs">
+            <img src={p.image}/><img src={p.image}/><img src={p.image}/>
+          </div>
+        </div>
+        <div className="detail-info">
+          <span className="detail-badge">-{p.discount}%</span>
+          <h1>{p.name}</h1>
+          <div className="rating"><Star size={15} fill="currentColor"/> {p.rating} <span>({p.reviews} đánh giá)</span></div>
+          <p>{p.short}</p>
+          <div className="detail-price">{money(p.price)}</div>
+          <div className="old-price">{money(p.oldPrice)}</div>
+          <div className="benefit-box">
+            <b>Ưu đãi khi mua hôm nay</b>
+            {p.promotions && p.promotions.split('|').map((promo, i) => promo.trim() && <p key={'p'+i}>🎁 {promo.trim()}</p>)}
+            {p.onlinePaymentOffers && p.onlinePaymentOffers.split('|').map((offer, i) => offer.trim() && <p key={'o'+i}>💳 {offer.trim()}</p>)}
+            {!p.promotions && !p.onlinePaymentOffers && (
+              <>
+                <p>✓ Giảm thêm khi thanh toán online</p>
+                <p>✓ Trả góp 0% qua thẻ tín dụng</p>
+                <p>✓ Miễn phí giao hàng theo điều kiện</p>
+              </>
+            )}
+          </div>
+          <div className="detail-actions">
+            <button className="btn primary" onClick={()=>addToCart(p.id)}><ShoppingCart/> Thêm vào giỏ</button>
+            <button onClick={()=>toggleWishlist(p.id)}><Heart/> Yêu thích</button>
+            <button onClick={()=>toggleCompare(p.id)}><Scale/> So sánh</button>
+          </div>
+        </div>
+      </section>
+      <section className="detail-sections">
+        <article>
+          <h2>Thông số kỹ thuật</h2>
+          {p.technicalSpecs ? 
+            p.technicalSpecs.split('|').map((spec, i) => {
+              if(!spec.trim()) return null;
+              const parts = spec.split(':');
+              if (parts.length >= 2) return <div className="spec-row" key={i}><span>{parts[0].trim()}</span><b>{parts.slice(1).join(':').trim()}</b></div>;
+              return <div className="spec-row" key={i}><b>{spec.trim()}</b></div>;
+            })
+            : Object.entries(p.specs).map(([k,v])=><div className="spec-row" key={k}><span>{k}</span><b>{v}</b></div>)
+          }
+        </article>
+        <article>
+          <h2>Mô tả sản phẩm & Dịch vụ</h2>
+          {p.servicePackages && (
+            <div style={{marginBottom: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px'}}>
+              <h3 style={{marginTop: 0, color: '#0739c7'}}>Chính sách bảo hành & Dịch vụ</h3>
+              {p.servicePackages.split('|').map((srv, i) => srv.trim() && <p key={i}>✓ {srv.trim()}</p>)}
+            </div>
+          )}
+          <p>{p.short}</p>
+          <p>Sản phẩm được phân phối chính hãng, hỗ trợ giao hàng toàn quốc và áp dụng chính sách bảo hành theo nhà sản xuất.</p>
+          <h3>Đánh giá khách hàng</h3>
+          {reviews.map((r,i)=><div className="review-line" key={i}><b>{r.name}</b><span>★★★★★</span><p>{r.content}</p></div>)}
+        </article>
+      </section>
+{related.length>0&&<section className="section"><div className="section-head"><h2>SẢN PHẨM LIÊN QUAN</h2></div><div className="product-grid four">{related.map(x=><ProductCard key={x.id} p={x}/>)}</div></section>}</div>);}

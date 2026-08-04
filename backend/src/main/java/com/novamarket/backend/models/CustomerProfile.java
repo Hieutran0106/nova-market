@@ -19,8 +19,12 @@ public class CustomerProfile {
     @Column(name = "extracted_budget")
     private Long extractedBudget;
 
-    @Column(name = "extracted_room_size")
-    private Integer extractedRoomSize;
+    @Column(name = "primary_usage", length = 100)
+    private String primaryUsage;
+
+    @Column(name = "preferred_brands", columnDefinition = "jsonb")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
+    private String preferredBrands;
 
     @Column(name = "preferences", columnDefinition = "jsonb")
     @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
