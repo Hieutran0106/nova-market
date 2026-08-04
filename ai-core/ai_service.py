@@ -4,6 +4,7 @@ import os
 import sys
 import io
 import psycopg2
+import re
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -54,7 +55,7 @@ def load_products_from_db():
             port="5432"
         )
         cursor = conn.cursor()
-        cursor.execute("SELECT id, category, brand, model_name, price_vnd, key_features FROM products WHERE in_stock = true")
+        cursor.execute("SELECT id, category, brand, model_name, price_vnd, key_features, in_stock FROM products")
         rows = cursor.fetchall()
         
         print(f"Bắt đầu Embedding (Mã hóa Vector)")
@@ -63,9 +64,13 @@ def load_products_from_db():
         for row in rows:
             price_str = f"{row[4]:,}".replace(",", ".")
             price_mil = row[4] / 1000000
-            formatted_text = f"- {row[1]} {row[2]} {row[3]}: Giá {price_str} VNĐ (khoảng {price_mil:.1f} triệu). Điểm nổi bật: {row[5]}"
+            status = "Còn hàng" if row[6] else "Hết hàng"
+            name = f"{row[1]} {row[2]} {row[3]}"
+            slug = re.sub(r'[^a-z0-9]', '-', name.lower())
+            slug = re.sub(r'-+', '-', slug)
+            formatted_text = f"- {name}: Giá {price_str} VNĐ (khoảng {price_mil:.1f} triệu). Tình trạng: {status}. Điểm nổi bật: {row[5]}. Link: [Xem chi tiết sản phẩm](/product/{slug})"
             
-            search_text = f"Category: {row[1]}, Brand: {row[2]}, Model: {row[3]}, Price: {price_str} VND ({price_mil:.1f} trieu), Features: {row[5]}"
+            search_text = f"Category: {row[1]}, Brand: {row[2]}, Model: {row[3]}, Price: {price_str} VND ({price_mil:.1f} trieu), Status: {status}, Features: {row[5]}"
             
             product_data.append({
                 'id': row[0],
